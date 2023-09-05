@@ -23,6 +23,7 @@ export class BookController {
     return this.bookService.findOne(+id);
   }
 
+  @UsePipes()
   @Patch('/:id')
   update(@Param('id') id: string, @Body() updateBookDto: UpdateBookDto) {
     return this.bookService.update(+id, updateBookDto);

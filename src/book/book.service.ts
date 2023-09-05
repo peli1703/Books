@@ -30,89 +30,91 @@ export class BookService {
       console.log(error.message)
       return {
         status: HttpStatus.BAD_REQUEST,
-        message: "Failed create book data"
+        message: "Failed create book "
       }
     }
   }
     
   async findAll() {
-    const book = await this.dbservice.book.findMany()
-    if(book){
-      return{
-        status:200,
-        massage:'success find book',
-        data: book
-      }
-    }else{
-      return{
-        status:400,
-        massage:'failed find book'
+    try {
+      const book = await this.dbservice.book.findMany()
+  return {
+    status: HttpStatus.OK,
+    message: "Success find book ",
+    data : book 
+  }
+    } catch (error) {
+      console.log(error.message)
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: "Failed find book "
       }
     }
   }
 
   async findOne(id: number) {
-    const book = await this.dbservice.book.findFirst({
-      where : {id}
-    })
-    if(book){
-      return{
-        status:200,
-        massage:'success find one book',
-        data: book
+    try {
+      const book = await this.dbservice.book.findFirst({
+        where : {id}
+      })
+      return {
+        status: HttpStatus.OK,
+        message: "Success find book ",
+        data:book
       }
-    }else{
-      return{
-        status:400,
-        massage:'failed find one book'
+    } catch (error) {
+      console.log(error.message)
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: "Failed find book "
       }
     }
+    
   }
 
   async update(id: number, updateBookDto:UpdateBookDto) {
-    const { name, author, category, title, description } = updateBookDto
-    // console.log(updateBookDto)
-    const book = await this.dbservice.book.update({
-      where : {id},
-      data: {
-        name :name,
-        author:author,
-        category :category,
-        title :title,
-        description :description,
-        updated_at : new Date()
-      }
-    })
-    if(book){
-      return{
-        status:200,
-        massage:'success update book',
-        data : {
-          book
+    try {
+      const { name, author, category, title, description } = updateBookDto
+      
+      const book = await this.dbservice.book.update({
+        where : {id},
+        data: {
+          name :name,
+          author:author,
+          category :category,
+          title :title,
+          description :description,
+          updated_at : new Date()
         }
+      })
+      return {
+        status: HttpStatus.CREATED,
+        message: "Success update book data"
       }
-    }else{
-      return{
-        status:400,
-        massage:'failed update book'
+    } catch (error) {
+      console.log(error.message)
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: "Failed update book "
       }
-    }
+    }    
   }
 
   async remove(id: number) {
-    const book = await this.dbservice.book.delete({
-      where:{id}
-    })
-    if(book){
-      return{
-        status:200,
-        massage:'success delete book',
-       
+
+    try {
+      const book = await this.dbservice.book.delete({
+        where:{id}
+      })
+      return {
+        status: HttpStatus.OK,
+        message: "Success delete book data"
       }
-    }else{
-      return{
-        status:400,
-        massage:'failed delete book'
+    } catch (error) {
+      console.log(error.message)
+      return {
+        status: HttpStatus.BAD_REQUEST,
+        message: "Failed delete book "
       }
     }
   }
