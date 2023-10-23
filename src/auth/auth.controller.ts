@@ -1,57 +1,37 @@
-import { 
-    Body,
-    Controller,
-    Get,
-    HttpCode,
-    Post,
-    UseGuards,
-    UsePipes,
-    ValidationPipe, 
-
+import {
+  Body,
+  Controller,
+  Get,
+  HttpStatus,
+  Post,
+  Req,
+  Res,
+  UseGuards,
 } from '@nestjs/common';
-import { AuthService } from "./auth.service"
-import { LoginDto } from "./dto/login.dto"
-import { RegisterDto } from "./dto/register.dto"
-import { JwtAuthGuard } from "./jwt-auth/jwt-auth.guard"
+import { AuthService } from './auth.service';
+import { AuthenticateDto } from './dto/authenticate.dto';
+import { JwtAuthGuard } from './jwt-auth/jwt-auth.guard';
+import { RoleGuard } from './role.guard';
+import { Roles } from './roles.decorator';
 
 @Controller('auth')
 export class AuthController {
-    /**
-   * Constructor
-   * @param authService
-   */
-  constructor(private authService: AuthService) {}
+  constructor(private readonly authService: AuthService) {}
 
-  /**
-   * Register controller
-   * @param dto
-   * @returns
-   */
-  @HttpCode(200)
-  @Post("register")
-  async register(@Body() dto: RegisterDto) {
-    return await this.authService.register(dto)
-  }
-
-  /**
-   * Login Controller
-   * @param dto
-   * @returns
-   */
-  @HttpCode(200)
-  @Post("login")
-  async login(@Body() dto: LoginDto) {
-    return await this.authService.login(dto)
-  }
-
-  /**
-   * Get detail User
-   */
-  @UseGuards(JwtAuthGuard)
-  @Get("profile")
-  async profile() {
-    return {
-      message: "Profile",
+  @Post()
+  login(@Res() res, @Body() authenticateDto: AuthenticateDto) {
+    try {
+      const response = this.authService.authenticate(authenticateDto);
+      return res.status(HttpStatus.OK).json({ response });
+    } catch (error) {
+      return res.status(error.status).json(error.response);
     }
+  }
+
+  @Roles('user')
+  @UseGuards(JwtAuthGuard, RoleGuard)
+  @Get()
+  profile(@Req() req, @Res() res) {
+    return res.status(HttpStatus.OK).json(req.user);
   }
 }
